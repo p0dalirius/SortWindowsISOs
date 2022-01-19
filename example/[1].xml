@@ -1,0 +1,81 @@
+<WIM>
+    <TOTALBYTES>530731284</TOTALBYTES>
+    <IMAGE INDEX="1">
+        <DIRCOUNT>3933</DIRCOUNT>
+        <FILECOUNT>16622</FILECOUNT>
+        <TOTALBYTES>1703884476</TOTALBYTES>
+        <HARDLINKBYTES>796026054</HARDLINKBYTES>
+        <CREATIONTIME>
+            <HIGHPART>0x01D4DE09</HIGHPART>
+            <LOWPART>0xC00A1F59</LOWPART>
+        </CREATIONTIME>
+        <LASTMODIFICATIONTIME>
+            <HIGHPART>0x01D57CC3</HIGHPART>
+            <LOWPART>0x3D467ACB</LOWPART>
+        </LASTMODIFICATIONTIME>
+        <WIMBOOT>0</WIMBOOT>
+        <WINDOWS>
+            <ARCH>9</ARCH>
+            <PRODUCTNAME>Microsoft� Windows� Operating System</PRODUCTNAME>
+            <EDITIONID>WindowsPE</EDITIONID>
+            <INSTALLATIONTYPE>WindowsPE</INSTALLATIONTYPE>
+            <PRODUCTTYPE>WinNT</PRODUCTTYPE>
+            <PRODUCTSUITE></PRODUCTSUITE>
+            <LANGUAGES>
+                <LANGUAGE>en-US</LANGUAGE>
+                <DEFAULT>en-US</DEFAULT>
+            </LANGUAGES>
+            <VERSION>
+                <MAJOR>10</MAJOR>
+                <MINOR>0</MINOR>
+                <BUILD>18362</BUILD>
+                <SPBUILD>418</SPBUILD>
+                <SPLEVEL>0</SPLEVEL>
+                <BRANCH>19h1_release</BRANCH>
+            </VERSION>
+            <SYSTEMROOT>WINDOWS</SYSTEMROOT>
+        </WINDOWS>
+        <NAME>Microsoft Windows PE (x64)</NAME>
+        <DESCRIPTION>Microsoft Windows PE (x64)</DESCRIPTION>
+        <FLAGS>9</FLAGS>
+    </IMAGE>
+    <IMAGE INDEX="2">
+        <DIRCOUNT>3977</DIRCOUNT>
+        <FILECOUNT>17156</FILECOUNT>
+        <TOTALBYTES>1880377454</TOTALBYTES>
+        <HARDLINKBYTES>878165484</HARDLINKBYTES>
+        <CREATIONTIME>
+            <HIGHPART>0x01D4DE09</HIGHPART>
+            <LOWPART>0xC7E4DE4C</LOWPART>
+        </CREATIONTIME>
+        <LASTMODIFICATIONTIME>
+            <HIGHPART>0x01D57CC3</HIGHPART>
+            <LOWPART>0xD6846352</LOWPART>
+        </LASTMODIFICATIONTIME>
+        <WIMBOOT>0</WIMBOOT>
+        <WINDOWS>
+            <ARCH>9</ARCH>
+            <PRODUCTNAME>Microsoft� Windows� Operating System</PRODUCTNAME>
+            <EDITIONID>WindowsPE</EDITIONID>
+            <INSTALLATIONTYPE>WindowsPE</INSTALLATIONTYPE>
+            <PRODUCTTYPE>WinNT</PRODUCTTYPE>
+            <PRODUCTSUITE></PRODUCTSUITE>
+            <LANGUAGES>
+                <LANGUAGE>en-US</LANGUAGE>
+                <DEFAULT>en-US</DEFAULT>
+            </LANGUAGES>
+            <VERSION>
+                <MAJOR>10</MAJOR>
+                <MINOR>0</MINOR>
+                <BUILD>18362</BUILD>
+                <SPBUILD>418</SPBUILD>
+                <SPLEVEL>0</SPLEVEL>
+                <BRANCH>19h1_release</BRANCH>
+            </VERSION>
+            <SYSTEMROOT>WINDOWS</SYSTEMROOT>
+        </WINDOWS>
+        <NAME>Microsoft Windows Setup (x64)</NAME>
+        <DESCRIPTION>Microsoft Windows Setup (x64)</DESCRIPTION>
+        <FLAGS>2</FLAGS>
+    </IMAGE>
+</WIM>
