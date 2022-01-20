@@ -64,20 +64,25 @@ drwx------ 8 podalirius podalirius 4,0K mars  19  2019  2
 drwx------ 2 podalirius podalirius  32K janv. 18 00:16 '[DELETED]'
 ```
 
-This file is a XML file containing information about the images contained inside the `./sources/boot.wim` file. It contains all the information we need to know which major or minor build this ISO file is. Here is an extract of the [`'[1].xml'`](./example/%5B1%5D.xml) file:
+This file is a XML file containing information about the images contained inside the `./sources/install.wim` file. It contains all the information we need to know which major or minor build this ISO file is. Here is an extract of the [`'[1].xml'`](./example/%5B1%5D.xml) file:
 
 ```xml
 <WIM>
-    <TOTALBYTES>530731284</TOTALBYTES>
+    <TOTALBYTES>4461218778</TOTALBYTES>
     <IMAGE INDEX="1">
         ...
         <WINDOWS>
             <ARCH>9</ARCH>
-            <PRODUCTNAME>Microsoft� Windows� Operating System</PRODUCTNAME>
-            <EDITIONID>WindowsPE</EDITIONID>
-            <INSTALLATIONTYPE>WindowsPE</INSTALLATIONTYPE>
-            <PRODUCTTYPE>WinNT</PRODUCTTYPE>
-            <PRODUCTSUITE></PRODUCTSUITE>
+            <PRODUCTNAME>Microsoft® Windows® Operating System</PRODUCTNAME>
+            <EDITIONID>ServerStandardEval</EDITIONID>
+            <INSTALLATIONTYPE>Server Core</INSTALLATIONTYPE>
+            <SERVICINGDATA>
+                <GDRDUREVISION>0</GDRDUREVISION>
+                <PKEYCONFIGVERSION>10.0.17763.719;2016-01-01T00:00:00Z</PKEYCONFIGVERSION>
+                <IMAGESTATE>IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE</IMAGESTATE>
+            </SERVICINGDATA>
+            <PRODUCTTYPE>ServerNT</PRODUCTTYPE>
+            <PRODUCTSUITE>Enterprise</PRODUCTSUITE>
             <LANGUAGES>
                 <LANGUAGE>en-US</LANGUAGE>
                 <DEFAULT>en-US</DEFAULT>
@@ -85,16 +90,18 @@ This file is a XML file containing information about the images contained inside
             <VERSION>
                 <MAJOR>10</MAJOR>
                 <MINOR>0</MINOR>
-                <BUILD>18362</BUILD>
-                <SPBUILD>418</SPBUILD>
+                <BUILD>17763</BUILD>
+                <SPBUILD>737</SPBUILD>
                 <SPLEVEL>0</SPLEVEL>
-                <BRANCH>19h1_release</BRANCH>
+                <BRANCH>rs5_release</BRANCH>
             </VERSION>
             <SYSTEMROOT>WINDOWS</SYSTEMROOT>
         </WINDOWS>
-        <NAME>Microsoft Windows PE (x64)</NAME>
-        <DESCRIPTION>Microsoft Windows PE (x64)</DESCRIPTION>
-        <FLAGS>9</FLAGS>
+        <NAME>Windows Server 2019 SERVERSTANDARDCORE</NAME>
+        <DESCRIPTION>Windows Server 2019 SERVERSTANDARDCORE</DESCRIPTION>
+        <FLAGS>ServerStandardEvalCore</FLAGS>
+        <DISPLAYNAME>Windows Server 2019 Standard Evaluation</DISPLAYNAME>
+        <DISPLAYDESCRIPTION>(Recommended) This option omits most of the Windows graphical environment. Manage with a command prompt and PowerShell, or remotely with Windows Admin Center or other tools.</DISPLAYDESCRIPTION>
     </IMAGE>
     ...
 </WIM>
