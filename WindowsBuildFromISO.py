@@ -120,8 +120,7 @@ def archive_iso(archive_dir, iso, versions, version_string, display_name, langua
         isoname = "%s.%s.%s.iso" % (version_string, isoname, languages_string)
     if not os.path.exists(basedir):
         os.makedirs(basedir, exist_ok=True)
-    if verbose:
-        print("   [>] Archiving to %s/%s" % (basedir, isoname))
+    print("   [>] Archiving to %s/%s" % (basedir, isoname))
     os.rename(iso, "%s/%s" % (basedir, isoname))
 
 
