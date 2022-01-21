@@ -84,7 +84,8 @@ def check_windows_version(isofile, verbose=False):
                 else:
                     display_name = "Windows %s" % (versions['major'])
     except Exception as e:
-        print("   [\x1b[91merror\x1b0m] %s" % e)
+        print("   [\x1b[91merror\x1b[0m] %s" % e)
+        versions, version_string, display_name, languages_string = None, None, None, None
 
     os.chdir(oldpwd)
     # Unmount ISO and remove temporary directory
@@ -171,11 +172,12 @@ if __name__ == '__main__':
         print("[iso] %s " % options.iso)
         try:
             versions, version_string, display_name, languages_string = check_windows_version(options.iso, verbose=options.verbose)
-            print_windows_version(versions, display_name, languages_string, no_colors=options.no_colors)
-            if options.archive_dir is not None:
-                archive_iso(options.archive_dir, options.iso, versions, version_string, display_name, languages_string, verbose=options.verbose)
+            if versions is not None and version_string is not None and display_name is not None and languages_string is not None:
+                print_windows_version(versions, display_name, languages_string, no_colors=options.no_colors)
+                if options.archive_dir is not None:
+                    archive_iso(options.archive_dir, options.iso, versions, version_string, display_name, languages_string, verbose=options.verbose)
         except Exception as e:
-            print("   [\x1b[91merror\x1b0m] %s" % e)
+            print("   [\x1b[91merror\x1b[0m] %s" % e)
     elif options.iso_dir is not None:
         if not os.path.isdir(options.iso_dir):
             print("[!] Cannot access ISO directory. Wrong path or bad permissions maybe ?")
@@ -192,9 +194,10 @@ if __name__ == '__main__':
             print("[iso] %s " % iso)
             try:
                 versions, version_string, display_name, languages_string = check_windows_version(iso, verbose=options.verbose)
-                print_windows_version(versions, display_name, languages_string, no_colors=options.no_colors)
-                if options.archive_dir is not None:
-                    archive_iso(options.archive_dir, iso, versions, version_string, display_name, languages_string, verbose=options.verbose)
+                if versions is not None and version_string is not None and display_name is not None and languages_string is not None:
+                    print_windows_version(versions, display_name, languages_string, no_colors=options.no_colors)
+                    if options.archive_dir is not None:
+                        archive_iso(options.archive_dir, iso, versions, version_string, display_name, languages_string, verbose=options.verbose)
             except Exception as e:
-                print("   [\x1b[91merror\x1b0m] %s" % e)
+                print("   [\x1b[91merror\x1b[0m] %s" % e)
 
