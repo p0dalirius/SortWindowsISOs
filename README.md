@@ -1,8 +1,8 @@
-# WindowsBuildFromISO
+# SortWindowsISOs
 
 <p align="center">Extract the windows major and minor build numbers from an ISO file, and automatically sort the iso files.</p>
 <p align="center">
-  <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/p0dalirius/WindowsBuildFromISO">
+  <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/p0dalirius/SortWindowsISOs">
   <a href="https://twitter.com/intent/follow?screen_name=podalirius_" title="Follow"><img src="https://img.shields.io/twitter/follow/podalirius_?label=Podalirius&style=social"></a>
   <br>
   <br>
@@ -22,19 +22,19 @@
 
  - **Automatically sort and rename the isos from a directory by major and minor build numbers.**
     ```
-    ./WindowsBuildFromISO.py --iso-dir ./isos/ --archive-dir ./archive/
+    ./SortWindowsISOs.py --iso-dir ./isos/ --archive-dir ./archive/
     ```
  
  - **Only get the major and minor build numbers of an ISO.**
     ```
-    ./WindowsBuildFromISO.py --iso ./isos/Win10_21H1_x64_English.iso
+    ./SortWindowsISOs.py --iso ./isos/Win10_21H1_x64_English.iso
     ```
 
 ## Usage
 
 ```
-$ ./WindowsBuildFromISO.py -h
-usage: WindowsBuildFromISO.py [-h] (-i ISO | -d ISO_DIR) [-a ARCHIVE_DIR] [-v]
+$ ./SortWindowsISOs.py -h
+usage: SortWindowsISOs.py [-h] (-i ISO | -d ISO_DIR) [-a ARCHIVE_DIR] [-v]
 
 Extract Windows Build number from ISO files. v1.1
 

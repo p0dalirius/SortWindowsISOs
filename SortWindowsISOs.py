@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# File name          : WindowsBuildFromISO.py
+# File name          : SortWindowsISOs.py
 # Author             : Podalirius (@podalirius_)
 # Date created       : 19 Jan 2022
 
@@ -12,8 +12,51 @@ import tempfile
 import xml.etree.ElementTree as ET
 
 
+def parse_1_xml():
+    versions, version_string, display_name, languages_string = None, None, None, None
+
+    archs = {"0": "x86", "9": "x64"}
+
+    tree = ET.parse('[1].xml')
+    image = tree.findall('IMAGE')[0]
+    windows = image.find('WINDOWS')
+    name = image.find('NAME')
+
+    # Architecture
+    arch = windows.find('ARCH')
+    arch_string = None
+    if arch is not None:
+        if arch.text.strip() in archs.keys():
+            arch_string = archs[arch.text.strip()]
+        else:
+            print("   [\x1b[91merror\x1b[0m] Unknown ARCH %s." % arch.text.strip())
+
+    # Versions
+    versions = {c.tag.lower(): c.text for c in list(windows.find('VERSION'))}
+    version_string = "%s.%s.%s.%s" % (versions['major'], versions['minor'], versions['build'], versions['spbuild'])
+
+    # Languages
+    languages = [l.text for l in windows.findall('LANGUAGES/LANGUAGE')]
+    languages_string = ("multi" if len(languages) > 1 else languages[0].lower())
+
+    # Display name
+    display_name = image.find('DISPLAYNAME')
+    if display_name is not None:
+        if "Evaluation" in display_name.text.strip():
+            display_name = display_name.text.strip().replace("Evaluation", "").strip()
+        else:
+            display_name = display_name.text.strip()
+    else:
+        if versions['minor'] != "0":
+            display_name = "Windows %s.%s" % (versions['major'], versions['minor'])
+        else:
+            display_name = "Windows %s" % (versions['major'])
+    display_name = display_name.replace("  ", " ")
+    return (arch_string, versions, version_string, display_name, languages_string)
+
+
 def check_windows_version(isofile, verbose=False):
-    versions, version_string, display_name, languages_string = None,None,None,None
+    arch_string, versions, version_string, display_name, languages_string = None, None, None, None, None
     # Mount iso read-only
     oldpwd = os.getcwd()
     iso_mount_dir = tempfile.TemporaryDirectory()
@@ -31,75 +74,59 @@ def check_windows_version(isofile, verbose=False):
     # Parse files in the ISO to get the Windows build
     os.chdir(work_dir.name)
     try:
-        if os.path.isfile(iso_mount_dir.name + "/sources/install.wim"):
+        found = False
+        if os.path.isfile(iso_mount_dir.name + "/sources/install.wim") and not found:
             if verbose:
-                print("   [>] Parsing Windows build number ...")
+                print("   [>] Parsing Windows build number from install.wim ...")
             if verbose:
                 print("   [>] Extracting install.wim '[1].xml' file ...")
-                os.system("7z e '%s/sources/install.wim' '[1].xml' -aoa 2>&1" % iso_mount_dir.name)
+                os.popen("7z e '%s/sources/install.wim' '[1].xml' -aoa 2>&1" % iso_mount_dir.name).read()
             else:
                 os.popen("7z e '%s/sources/install.wim' '[1].xml' -aoa 2>&1" % iso_mount_dir.name).read()
             if verbose:
                 print("   [>] Parsing install.wim '[1].xml' file ...")
-            tree = ET.parse('[1].xml')
-            image = tree.findall('IMAGE')[0]
-            windows = image.find('WINDOWS')
-            # Versions
-            versions = {c.tag.lower(): c.text for c in list(windows.find('VERSION'))}
-            version_string = "%s.%s.%s.%s" % (versions['major'], versions['minor'], versions['build'], versions['spbuild'])
-            # Languages
-            languages = [l.text for l in windows.findall('LANGUAGES/LANGUAGE')]
-            languages_string = ("multi" if len(languages) > 1 else languages[0].lower())
-            # Display name
-            display_name = image.find('DISPLAYNAME').text.strip()
-            if "Evaluation" in display_name:
-                display_name = display_name.replace("Evaluation", "").strip()
+            if os.path.exists('[1].xml'):
+                (arch_string, versions, version_string, display_name, languages_string) = parse_1_xml()
+                found = True
+            else:
+                if verbose:
+                    print("   [\x1b[91merror\x1b[0m] File '[1].xml' does not exist.")
 
-        elif os.path.isfile(iso_mount_dir.name + "/sources/boot.wim"):
+        if os.path.isfile(iso_mount_dir.name + "/sources/boot.wim") and not found:
             if verbose:
-                print("   [>] Parsing Windows build number ...")
+                print("   [>] Parsing Windows build number from boot.wim ...")
             if verbose:
                 print("   [>] Extracting boot.wim '[1].xml' file ...")
-                os.system("7z e '%s/sources/boot.wim' '[1].xml' -aoa 2>&1" % iso_mount_dir.name)
+                os.popen("7z e '%s/sources/boot.wim' '[1].xml' -aoa 2>&1" % iso_mount_dir.name).read()
             else:
                 os.popen("7z e '%s/sources/boot.wim' '[1].xml' -aoa 2>&1" % iso_mount_dir.name).read()
             if verbose:
                 print("   [>] Parsing boot.wim '[1].xml' file ...")
-            tree = ET.parse('[1].xml')
-            image = tree.findall('IMAGE')[0]
-            windows = image.find('WINDOWS')
-            # Versions
-            versions = {c.tag.lower(): c.text for c in list(windows.find('VERSION'))}
-            version_string = "%s.%s.%s.%s" % (versions['major'], versions['minor'], versions['build'], versions['spbuild'])
-            # Languages
-            languages = [l.text for l in windows.findall('LANGUAGES/LANGUAGE')]
-            languages_string = ("multi" if len(languages) > 1 else languages[0].lower())
-            # Display name
-            display_name = image.find('DISPLAYNAME')
-            if display_name is not None:
-                display_name = display_name.text.strip()
+            if os.path.exists('[1].xml'):
+                (arch_string, versions, version_string, display_name, languages_string) = parse_1_xml()
+                found = True
             else:
-                if versions['minor'] != "0":
-                    display_name = "Windows %s.%s" % (versions['major'], versions['minor'])
-                else:
-                    display_name = "Windows %s" % (versions['major'])
+                if verbose:
+                    print("   [\x1b[91merror\x1b[0m] File '[1].xml' does not exist.")
+
+
     except Exception as e:
         print("   [\x1b[91merror\x1b[0m] %s" % e)
-        versions, version_string, display_name, languages_string = None, None, None, None
+        arch_string, versions, version_string, display_name, languages_string = None, None, None, None, None
 
     os.chdir(oldpwd)
     # Unmount ISO and remove temporary directory
-    if options.verbose:
-        print("[>] Unmounting ISO from %s ..." % iso_mount_dir.name)
+    if verbose:
+        print("   [>] Unmounting ISO from %s ..." % iso_mount_dir.name)
         os.system("umount %s 2>&1" % iso_mount_dir.name)
     else:
         os.popen("umount %s 2>&1" % iso_mount_dir.name).read()
     work_dir.cleanup()
     iso_mount_dir.cleanup()
-    return (versions, version_string, display_name, languages_string)
+    return (arch_string, versions, version_string, display_name, languages_string)
 
 
-def archive_iso(archive_dir, iso, versions, version_string, display_name, languages_string, verbose=False):
+def archive_iso(archive_dir, iso, versions, version_string, arch_string, display_name, languages_string, verbose=False):
     os_type = ""
     display_name = display_name.strip()
     m = re.match('^(Windows [0-9]+(\.[0-9]+)?)', display_name)
@@ -112,42 +139,52 @@ def archive_iso(archive_dir, iso, versions, version_string, display_name, langua
         os_type = display_name
 
     basedir = "%s/%s/%s - %s/%s/" % (archive_dir, os_type, version_string, display_name, languages_string)
-    # basedir = basedir.replace(' ', '_')
     isoname = display_name.replace(' ', '_')
     if "branch" in versions.keys():
-        isoname = "%s.%s.%s.%s.iso" % (version_string, isoname, versions['branch'], languages_string)
+        isoname = "%s.%s.%s.%s.%s.iso" % (version_string, isoname, arch_string, versions['branch'], languages_string)
     else:
-        isoname = "%s.%s.%s.iso" % (version_string, isoname, languages_string)
+        isoname = "%s.%s.%s.%s.iso" % (version_string, isoname, arch_string, languages_string)
     if not os.path.exists(basedir):
         os.makedirs(basedir, exist_ok=True)
-    print("   [>] Archiving to %s/%s" % (basedir, isoname))
+    print("   [>] Archiving to %s%s" % (basedir, isoname))
     os.rename(iso, "%s/%s" % (basedir, isoname))
 
 
-def print_windows_version(versions, display_name, languages_string, no_colors=False):
-    _os, _build, _lang, _branch = "", "", "", ""
+def print_windows_version(versions, arch_string, display_name, languages_string, no_colors=False):
+    _os, _arch, _build, _lang, _branch = "", "", "", "", ""
     # Windows version
     if no_colors:
         _os = "%s" % display_name
     else:
         _os = "\x1b[92m%s\x1b[0m" % display_name
+
+    # Arch
+    if arch_string is not None:
+        if no_colors:
+            _arch = "(arch:%s)" % arch_string
+        else:
+            _arch = "(\x1b[94march\x1b[0m:\x1b[96m%s\x1b[0m)" % arch_string
+
     # Build
     if no_colors:
         _build = "(build:%s.%s)" % (versions['build'], versions['spbuild'])
     else:
         _build = "(\x1b[94mbuild\x1b[0m:\x1b[96m%s.%s\x1b[0m)" % (versions['build'], versions['spbuild'])
+
     # Branch
     if "branch" in versions.keys():
         if no_colors:
             _branch = "(branch:%s)" % (versions['branch'])
         else:
             _branch = "(\x1b[94mbranch\x1b[0m:\x1b[96m%s\x1b[0m)" % (versions['branch'])
+
     # Languages
     if no_colors:
         _lang = "(lang:%s)" % languages_string
     else:
         _lang = "(\x1b[94mlang\x1b[0m:\x1b[96m%s\x1b[0m)" % languages_string
-    print("   [+] %s %s %s %s" % (_os, _build, _branch, _lang))
+
+    print("   [+] %s %s %s %s %s" % (_os, _arch, _build, _branch, _lang))
 
 
 def parseArgs():
@@ -170,11 +207,11 @@ if __name__ == '__main__':
             sys.exit(-1)
         print("[iso] %s " % options.iso)
         try:
-            versions, version_string, display_name, languages_string = check_windows_version(options.iso, verbose=options.verbose)
+            arch_string, versions, version_string, display_name, languages_string = check_windows_version(options.iso, verbose=options.verbose)
             if versions is not None and version_string is not None and display_name is not None and languages_string is not None:
-                print_windows_version(versions, display_name, languages_string, no_colors=options.no_colors)
+                print_windows_version(versions, arch_string, display_name, languages_string, no_colors=options.no_colors)
                 if options.archive_dir is not None:
-                    archive_iso(options.archive_dir, options.iso, versions, version_string, display_name, languages_string, verbose=options.verbose)
+                    archive_iso(options.archive_dir, options.iso, versions, version_string, arch_string, display_name, languages_string, verbose=options.verbose)
         except Exception as e:
             print("   [\x1b[91merror\x1b[0m] %s" % e)
     elif options.iso_dir is not None:
@@ -192,11 +229,10 @@ if __name__ == '__main__':
         for iso in iso_files:
             print("[iso] %s " % iso)
             try:
-                versions, version_string, display_name, languages_string = check_windows_version(iso, verbose=options.verbose)
+                arch_string, versions, version_string, display_name, languages_string = check_windows_version(iso, verbose=options.verbose)
                 if versions is not None and version_string is not None and display_name is not None and languages_string is not None:
-                    print_windows_version(versions, display_name, languages_string, no_colors=options.no_colors)
+                    print_windows_version(versions, arch_string, display_name, languages_string, no_colors=options.no_colors)
                     if options.archive_dir is not None:
-                        archive_iso(options.archive_dir, iso, versions, version_string, display_name, languages_string, verbose=options.verbose)
+                        archive_iso(options.archive_dir, iso, versions, version_string, arch_string, display_name, languages_string, verbose=options.verbose)
             except Exception as e:
                 print("   [\x1b[91merror\x1b[0m] %s" % e)
-
