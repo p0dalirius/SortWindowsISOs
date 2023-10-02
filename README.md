@@ -1,4 +1,4 @@
-# SortWindowsISOs
+![](./.github/banner.png)
 
 <p align="center">
   Extract the windows major and minor build numbers from an ISO file, and automatically sort the iso files.
