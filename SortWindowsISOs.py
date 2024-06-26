@@ -21,7 +21,7 @@ def sha256sum(path_to_file):
     sha256 = hashlib.sha256()
 
     with Progress() as progress:
-        task1 = progress.add_task("[green] Hashing SHA256 ...", total=os.path.getsize(path_to_file))
+        task1 = progress.add_task("[green]     | Hashing SHA256 ...", total=os.path.getsize(path_to_file))
         with open(path_to_file, 'rb') as f:
             while True:
                 data = f.read(BUF_SIZE)
