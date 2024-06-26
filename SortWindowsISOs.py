@@ -5,11 +5,32 @@
 # Date created       : 19 Jan 2022
 
 import argparse
+import hashlib
 import os
 import re
+from rich.progress import Progress
 import sys
 import tempfile
 import xml.etree.ElementTree as ET
+
+
+def sha256sum(path_to_file):
+    # BUF_SIZE is totally arbitrary, change for your app!
+    BUF_SIZE = 65536  # lets read stuff in 64kb chunks!
+
+    sha256 = hashlib.sha256()
+
+    with Progress() as progress:
+        task1 = progress.add_task("[green] Hashing SHA256 ...", total=os.path.getsize(path_to_file))
+        with open(path_to_file, 'rb') as f:
+            data = f.read(BUF_SIZE)
+            if len(data) != 0:
+                progress.update(task1, advance=len(data))
+                sha256.update(data)
+            else:
+                break;
+
+    return sha256.hexdigest()
 
 
 def parse_1_xml():
@@ -126,7 +147,7 @@ def check_windows_version(isofile, verbose=False):
     return (arch_string, versions, version_string, display_name, languages_string)
 
 
-def archive_iso(archive_dir, iso, versions, version_string, arch_string, display_name, languages_string, verbose=False):
+def archive_iso(archive_dir, path_to_iso, versions, version_string, arch_string, display_name, languages_string, verbose=False):
     os_type = ""
     display_name = display_name.strip()
     m = re.match('^(Windows [0-9]+(\.[0-9]+)?)', display_name)
@@ -138,7 +159,9 @@ def archive_iso(archive_dir, iso, versions, version_string, arch_string, display
     if os_type == "":
         os_type = display_name
 
-    basedir = "%s/%s/%s - %s/%s/" % (archive_dir, os_type, version_string, display_name, languages_string)
+    h = sha256sum(path_to_iso)
+
+    basedir = "%s/%s/%s - %s/%s/%s/" % (archive_dir, os_type, version_string, display_name, languages_string, h)
     isoname = display_name.replace(' ', '_')
     if "branch" in versions.keys():
         isoname = "%s.%s.%s.%s.%s.iso" % (version_string, isoname, arch_string, versions['branch'], languages_string)
@@ -146,6 +169,7 @@ def archive_iso(archive_dir, iso, versions, version_string, arch_string, display
         isoname = "%s.%s.%s.%s.iso" % (version_string, isoname, arch_string, languages_string)
     if not os.path.exists(basedir):
         os.makedirs(basedir, exist_ok=True)
+    
     print("   [>] Archiving to %s%s" % (basedir, isoname))
     os.rename(iso, "%s/%s" % (basedir, isoname))
 
@@ -214,6 +238,7 @@ if __name__ == '__main__':
                     archive_iso(options.archive_dir, options.iso, versions, version_string, arch_string, display_name, languages_string, verbose=options.verbose)
         except Exception as e:
             print("   [\x1b[91merror\x1b[0m] %s" % e)
+            
     elif options.iso_dir is not None:
         if not os.path.isdir(options.iso_dir):
             print("[!] Cannot access ISO directory. Wrong path or bad permissions maybe ?")
