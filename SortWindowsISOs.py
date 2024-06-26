@@ -23,12 +23,13 @@ def sha256sum(path_to_file):
     with Progress() as progress:
         task1 = progress.add_task("[green] Hashing SHA256 ...", total=os.path.getsize(path_to_file))
         with open(path_to_file, 'rb') as f:
-            data = f.read(BUF_SIZE)
-            if len(data) != 0:
-                progress.update(task1, advance=len(data))
-                sha256.update(data)
-            else:
-                break;
+            while True:
+                data = f.read(BUF_SIZE)
+                if len(data) != 0:
+                    progress.update(task1, advance=len(data))
+                    sha256.update(data)
+                else:
+                    break;
 
     return sha256.hexdigest()
 
@@ -238,7 +239,7 @@ if __name__ == '__main__':
                     archive_iso(options.archive_dir, options.iso, versions, version_string, arch_string, display_name, languages_string, verbose=options.verbose)
         except Exception as e:
             print("   [\x1b[91merror\x1b[0m] %s" % e)
-            
+
     elif options.iso_dir is not None:
         if not os.path.isdir(options.iso_dir):
             print("[!] Cannot access ISO directory. Wrong path or bad permissions maybe ?")
