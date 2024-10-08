@@ -14,6 +14,58 @@ import tempfile
 import xml.etree.ElementTree as ET
 
 
+def translate(display_name):
+    display_name = display_name.strip()
+
+    if display_name.startswith("Ознакомительная версия"):
+        a, b = display_name.replace("Ознакомительная версия", "Evaluation Version").split(' (',1)
+        display_name = a + " Evaluation Version (" + b
+
+    if display_name.startswith("Evaluación de "):
+        a, b = display_name.replace("Evaluación de ", "Evaluation Version").split(' (',1)
+        display_name = a + " Evaluation Version (" + b
+
+    if display_name.startswith("Version d’évaluation de "):
+        a, b = display_name.replace("Version d’évaluation de ", "Evaluation Version").split(' (',1)
+        display_name = a + " Evaluation Version (" + b
+
+    translate_table = {
+        # fr-fr
+        "(installation minimale)": "(Minimal Installation)",
+
+        # ru-ru
+        "Ознакомительная версия": "Evaluation Version",
+        "(полная установка)": "(Full Installation)",
+        "(установка основных серверных компонентов)": "(Server Core Installation)",
+        "Домашняя": "Home Edition",
+        "Начальная": "Initial", # "Initial"
+
+        # zh-cn
+        "评估版": "Evaluation Version",
+        "(完全安装)": "(Full Installation)",
+        "(服务器核心安装)": "(Server Core Installation)",
+        "家庭版": "Home Edition",
+
+        #
+        # "": "Evaluation Version",
+        "(installazione dei componenti core del server)": "(Server Core Installation)",
+
+        #
+        # "": " Evaluation Version",
+        "(Instalação Server Core)": "(Server Core Installation)",
+
+        # ja-jp
+        "(フル_インストール)": "(Full Installation)"
+    }
+
+    for original in sorted(translate_table.keys(), key=lambda x:len(x), reverse=True):
+        display_name = display_name.replace(original, " "+translate_table[original])
+
+    display_name = re.sub('[ ]+', ' ', display_name)
+
+    return display_name
+
+
 def sha256sum(path_to_file):
     # BUF_SIZE is totally arbitrary, change for your app!
     BUF_SIZE = 65536  # lets read stuff in 64kb chunks!
@@ -37,7 +89,21 @@ def sha256sum(path_to_file):
 def parse_1_xml():
     versions, version_string, display_name, languages_string = None, None, None, None
 
-    archs = {"0": "x86", "9": "x64"}
+    archs = {
+        "0": "x86",
+        "1": "arch=1",
+        "2": "arch=2",
+        "3": "arch=3",
+        "4": "arch=4",
+        "5": "arm",
+        "6": "ia64",
+        "7": "arch=7",
+        "8": "arch=8",
+        "9": "amd64", 
+        "10": "arch=10",
+        "11": "arch=11",
+        "12": "arm64"
+    }
 
     tree = ET.parse('[1].xml')
     image = tree.findall('IMAGE')[0]
@@ -64,10 +130,7 @@ def parse_1_xml():
     # Display name
     display_name = image.find('DISPLAYNAME')
     if display_name is not None:
-        if "Evaluation" in display_name.text.strip():
-            display_name = display_name.text.strip().replace("Evaluation", "").strip()
-        else:
-            display_name = display_name.text.strip()
+        display_name = display_name.text.strip()
     else:
         if versions['minor'] != "0":
             display_name = "Windows %s.%s" % (versions['major'], versions['minor'])
@@ -160,17 +223,21 @@ def archive_iso(archive_dir, path_to_iso, versions, version_string, arch_string,
     if os_type == "":
         os_type = display_name
 
+    display_name = translate(display_name)
+
     h = sha256sum(path_to_iso)
 
-    basedir = "%s/%s/%s - %s/%s/%s/" % (archive_dir, os_type, version_string, display_name, languages_string, h)
+    # basedir = "%s/%s/%s - %s/%s/%s/%s/%s/" % (archive_dir, os_type, version_string, display_name, languages_string, arch_string, versions['branch'], h)
     isoname = display_name.replace(' ', '_')
     if "branch" in versions.keys():
+        basedir = "%s/%s/%s - %s/%s/%s/%s/%s/" % (archive_dir, os_type, version_string, display_name, languages_string, arch_string, versions['branch'], h)
         isoname = "%s.%s.%s.%s.%s.iso" % (version_string, isoname, arch_string, versions['branch'], languages_string)
     else:
+        basedir = "%s/%s/%s - %s/%s/%s/%s/" % (archive_dir, os_type, version_string, display_name, languages_string, arch_string, h)
         isoname = "%s.%s.%s.%s.iso" % (version_string, isoname, arch_string, languages_string)
     if not os.path.exists(basedir):
         os.makedirs(basedir, exist_ok=True)
-    
+
     print("   [>] Archiving to %s%s" % (basedir, isoname))
     os.rename(iso, "%s/%s" % (basedir, isoname))
 
