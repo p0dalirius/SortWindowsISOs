@@ -37,14 +37,15 @@ def translate(display_name):
         "Ознакомительная версия": "Evaluation Version",
         "(полная установка)": "(Full Installation)",
         "(установка основных серверных компонентов)": "(Server Core Installation)",
-        "Домашняя": "Home Edition",
+        "Домашняя": "Home",
         "Начальная": "Initial", # "Initial"
 
         # zh-cn
         "评估版": "Evaluation Version",
         "(完全安装)": "(Full Installation)",
         "(服务器核心安装)": "(Server Core Installation)",
-        "家庭版": "Home Edition",
+        "家庭版": "Home",
+        "教育版": "Education",
 
         #
         # "": "Evaluation Version",
@@ -99,7 +100,7 @@ def parse_1_xml():
         "6": "ia64",
         "7": "arch=7",
         "8": "arch=8",
-        "9": "amd64", 
+        "9": "amd64",
         "10": "arch=10",
         "11": "arch=11",
         "12": "arm64"
